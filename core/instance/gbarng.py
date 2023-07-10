@@ -23,9 +23,13 @@ class GameVersion(IntEnum):
 
 class GameLanguage(IntEnum):
     """Gen 3 game langauge"""
+    EUR = 0
     USA = ord("E")
     JPN = ord("J")
-    # EUR = ...
+
+    @classmethod
+    def _missing_(cls, _value):
+        return cls.EUR
 
 def rng_info_window():
     """RNG seed info"""
