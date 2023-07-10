@@ -101,29 +101,11 @@ def pokemon_info_window(address_function, title: str, pos: list[int, int] = None
 
     def update():
         addr = address_function()
-        pk3 = PK3(hook.read_bytes(addr, 80))
-        pid = pk3.read_uint(0, 4)
-        otid = pk3.read_uint(4, 4)
-        psv = pid ^ otid
-        psv = (psv ^ (psv >> 16)) & 0xFFFF
-        shiny = psv < 8
-        iv32 = pk3.read_uint(0x48, 4)
-        ivs = (
-            iv32 & 0x1F,
-            (iv32 >> 5) & 0x1F,
-            (iv32 >> 10) & 0x1F,
-            (iv32 >> 20) & 0x1F,
-            (iv32 >> 25) & 0x1F,
-            (iv32 >> 15) & 0x1F,
-        )
-        try:
-            species = SPECIES_MAP[pk3.read_uint(0x20, 2)]
-        except IndexError:
-            species = 0
-        load_sprite(species, 0, shiny, species_texture)
-        dpg.set_value(species_label, SPECIES_EN[species])
-        dpg.set_value(pid_label, f"PID: {pid:08X}")
-        dpg.set_value(iv_label, f"IVs: {'/'.join(map(str, ivs))}")
+        pk3 = PK3(hook.read_bytes(addr, 0x50))
+        load_sprite(pk3.species, 0, pk3.shiny, species_texture)
+        dpg.set_value(species_label, SPECIES_EN[pk3.species])
+        dpg.set_value(pid_label, f"PID: {pk3.pid:08X}")
+        dpg.set_value(iv_label, f"IVs: {'/'.join(map(str, pk3.ivs))}")
 
     return update
 
@@ -142,13 +124,13 @@ def get_party_addr(party_slot: int):
             match GameLanguage(hook.read_uint(0x080000AF, 1)):
                 # JPN
                 case GameLanguage.JPN:
-                    return 0x03004290 + (party_slot * 0x64)
+                    return 0x020241E4 + (party_slot * 0x64)
                 # USA
                 case GameLanguage.USA:
-                    return 0x03004360 + (party_slot * 0x64)
+                    return 0x02024284 + (party_slot * 0x64)
                 # EUR
                 case _:
-                    return 0x03004370 + (party_slot * 0x64)
+                    return 0x02024284 + (party_slot * 0x64)
         case GameVersion.EMERALD:
             match GameLanguage(hook.read_uint(0x080000AF, 1)):
                 # JPN
