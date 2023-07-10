@@ -3,7 +3,7 @@
 import dearpygui.dearpygui as dpg
 
 from core.util import get_pid_list
-from core.instance import gen3rng as instance
+from core.instance import gbarng as instance
 
 def hook_callback():
     """Hook into the selected process"""
