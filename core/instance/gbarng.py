@@ -120,10 +120,13 @@ def get_party_addr(party_slot: int):
             match GameLanguage(hook.read_uint(0x080000AF, 1)):
                 # JPN
                 case GameLanguage.JPN:
-                    return 0x020241E4 + (party_slot * 0x64)
-                # USA/EUR
+                    return 0x03004290 + (party_slot * 0x64)
+                # USA
+                case GameLanguage.USA:
+                    return 0x03004360 + (party_slot * 0x64)
+                # EUR
                 case _:
-                    return 0x02024284 + (party_slot * 0x64)
+                    return 0x03004370 + (party_slot * 0x64)
         case GameVersion.FIRERED | GameVersion.LEAFGREEN:
             match GameLanguage(hook.read_uint(0x080000AF, 1)):
                 # JPN
