@@ -6,7 +6,7 @@ import dearpygui.dearpygui as dpg
 from numba_pokemon_prngs.data import SPECIES_EN
 
 from ..hook.mgba_hook import MGBAHook
-from ..util import lcrng_distance, load_sprite, SPECIES_MAP
+from ..util import lcrng_distance, load_sprite
 from ..pkm.pk3 import PK3
 
 KEY_WORD = "mgba"

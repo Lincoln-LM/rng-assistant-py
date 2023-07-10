@@ -99,7 +99,7 @@ class PK3:
 
     @property
     def ivs(self) -> tuple[int, int, int, int, int, int]:
-        """Individial Values"""
+        """Individial values"""
         iv32 = self.iv32
         return (
             iv32 & 0x1F,
