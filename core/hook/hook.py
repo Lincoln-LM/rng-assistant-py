@@ -2,7 +2,6 @@
 
 from abc import abstractmethod
 import contextlib
-import logging
 import ctypes
 import struct
 import mem_edit

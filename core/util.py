@@ -1,5 +1,6 @@
 """Utility Functions"""
 
+import platform
 from io import BytesIO
 from PIL import Image
 import requests
@@ -64,11 +65,14 @@ def get_pid_list(key_word: str = None):
     pid_list = []
     available_pids = mem_edit.Process.list_available_pids()
     for pid in available_pids:
-        # TODO: windows support
         try:
-            with open(f'/proc/{pid}/cmdline', 'rb') as cmdline:
-                path = cmdline.read().decode().split('\x00')[0].split(" ")[0]
-        except FileNotFoundError:
+            if platform.system() == "Windows":
+                with mem_edit.Process.open_process(pid) as process:
+                    path = process.get_path()
+            else:
+                with open(f'/proc/{pid}/cmdline', 'rb') as cmdline:
+                    path = cmdline.read().decode().split('\x00')[0].split(" ")[0]
+        except (ValueError, mem_edit.MemEditError, FileNotFoundError):
             continue
         if path:
             if key_word:
