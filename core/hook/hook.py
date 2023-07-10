@@ -9,13 +9,13 @@ import mem_edit
 class Hook:
     """Base class for hooking into a process"""
 
-    def __init__(self, pid: int = None) -> None:
+    def __init__(self, pid: int = None, *args, **kwargs) -> None:
         self.process = None
         self.is_initialized = False
         if pid is not None:
             self.hook(pid)
 
-    def hook(self, pid: int) -> None:
+    def hook(self, pid: int, *args, **kwargs) -> None:
         """Hook to the specified pid"""
         if self.process is not None:
             self.is_initialized = False
@@ -51,7 +51,7 @@ class Hook:
 
     def read_ctype(self, address: int, ctype):
         """Read ctype type at address"""
-        # TODO: validation
+        # TODO: validation, game reading
         return self.process.read_memory(self.convert_address(address), ctype())
 
     def read_int(self, address: int, length: int) -> int:
