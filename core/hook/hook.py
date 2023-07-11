@@ -18,8 +18,7 @@ class Hook:
     def hook(self, pid: int, *args, **kwargs) -> None:
         """Hook to the specified pid"""
         if self.process is not None:
-            self.is_initialized = False
-            self.process.close()
+            self.detach()
         self.process = mem_edit.Process(pid)
 
         self.detect_memory_bases()
@@ -70,7 +69,9 @@ class Hook:
             signed=False
         )
 
-    def __del__(self) -> None:
+    def detach(self) -> None:
+        """Detach from process"""
+        self.is_initialized = False
         if self.process is not None:
-            with contextlib.suppress(ChildProcessError):
+            with contextlib.suppress(ChildProcessError, mem_edit.utils.MemEditError):
                 self.process.close()

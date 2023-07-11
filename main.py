@@ -5,6 +5,7 @@ from tkinter import filedialog
 import logging
 
 import dearpygui.dearpygui as dpg
+import mem_edit
 
 from core.util import get_pid_list
 from core.instance import gbarng as instance
@@ -52,6 +53,9 @@ while dpg.is_dearpygui_running():
                 window_update()
         except (AddressOutOfRange,) as error:
             logging.error(error)
+        except (mem_edit.utils.MemEditError, OSError) as error:
+            logging.error(error)
+            instance.hook.detach()
     dpg.render_dearpygui_frame()
 
 dpg.destroy_context()

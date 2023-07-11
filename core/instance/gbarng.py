@@ -34,7 +34,7 @@ class GameLanguage(IntEnum):
 def rng_info_window():
     """RNG seed info"""
 
-    with dpg.window(label="RNG Info", width=240, no_close=True, pos=[1, 100]):
+    with dpg.window(label="RNG Info", width=240, no_close=True, pos=[1, 100 + 25]):
         initial_seed_label = dpg.add_text("Initial Seed:")
         current_seed_label = dpg.add_text("Current Seed:")
         current_advance_label = dpg.add_text("Current Advance:")
@@ -191,13 +191,13 @@ def wild_info_window():
     return pokemon_info_window(
         get_wild_addr,
         "Wild",
-        [1, 201]
+        [1, 201 + 25]
     )
 
 def trainer_info_window():
     """Trainer info"""
 
-    with dpg.window(label="Trainer Info", width=240, no_close=True, pos=[1, 362]):
+    with dpg.window(label="Trainer Info", width=240, no_close=True, pos=[1, 362 + 25]):
         tid_sid_label = dpg.add_text("TID/SID:")
 
     def update():
