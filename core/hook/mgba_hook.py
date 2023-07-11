@@ -2,6 +2,7 @@
 
 import logging
 from .hook import Hook
+from ..exceptions import AddressOutOfRange
 
 class MGBAHook(Hook):
     """Class for hooking into mGBA"""
@@ -47,7 +48,7 @@ class MGBAHook(Hook):
         #     # GAME
         #     return address - 0x8000000 + self.game_base
 
-        raise NotImplementedError(f"Address {address:X} out of range")
+        raise AddressOutOfRange(f"Address {address:X} out of range")
 
     def read_bytes(self, address: int, length: int) -> bytes:
         if 0x8000000 <= address < 0xA000000:

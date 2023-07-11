@@ -8,6 +8,7 @@ import dearpygui.dearpygui as dpg
 
 from core.util import get_pid_list
 from core.instance import gbarng as instance
+from core.exceptions import AddressOutOfRange
 
 def file_callback():
     """Select ROM file"""
@@ -46,8 +47,11 @@ dpg.show_viewport()
 dpg.set_primary_window("Settings", True)
 while dpg.is_dearpygui_running():
     if instance.hook.is_initialized:
-        for window_update in windows:
-            window_update()
+        try:
+            for window_update in windows:
+                window_update()
+        except (AddressOutOfRange,) as error:
+            logging.error(error)
     dpg.render_dearpygui_frame()
 
 dpg.destroy_context()
