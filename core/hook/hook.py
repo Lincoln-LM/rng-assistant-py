@@ -9,13 +9,13 @@ import mem_edit
 class Hook:
     """Base class for hooking into a process"""
 
-    def __init__(self, pid: int = None, *args, **kwargs) -> None:
+    def __init__(self, pid: int = None) -> None:
         self.process = None
         self.is_initialized = False
         if pid is not None:
             self.hook(pid)
 
-    def hook(self, pid: int, *args, **kwargs) -> None:
+    def hook(self, pid: int) -> None:
         """Hook to the specified pid"""
         if self.process is not None:
             self.detach()

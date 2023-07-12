@@ -7,20 +7,11 @@ from ..exceptions import AddressOutOfRange
 class MGBAHook(Hook):
     """Class for hooking into mGBA"""
 
-    def __init__(self, pid: int = None, file_name: str = None, *args, **kwargs) -> None:
+    def __init__(self, pid: int = None) -> None:
         self.wram_base = None
         self.iram_base = None
-        self.file_name = file_name
         self.game_data = None
         super().__init__(pid)
-
-    def hook(self, pid: int, file_name = None, *args, **kwargs) -> None:
-        self.file_name = file_name or self.file_name
-
-        with open(file_name, "rb") as game_rom:
-            self.game_data = game_rom.read(0x100)
-
-        return super().hook(pid, *args, **kwargs)
 
     def detect_memory_bases(self) -> None:
         for minimum, maximum in self.process.list_mapped_regions():
@@ -49,10 +40,3 @@ class MGBAHook(Hook):
         #     return address - 0x8000000 + self.game_base
 
         raise AddressOutOfRange(f"Address {address:X} out of range")
-
-    def read_bytes(self, address: int, length: int) -> bytes:
-        if 0x8000000 <= address < 0xA000000:
-            # game rom address
-            ofs = address - 0x8000000
-            return self.game_data[ofs:ofs+length]
-        return super().read_bytes(address, length)
