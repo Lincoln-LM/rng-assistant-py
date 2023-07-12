@@ -1,6 +1,7 @@
 """GBA RNG Instance"""
 
 from enum import IntEnum
+import logging
 import dearpygui.dearpygui as dpg
 from numba_pokemon_prngs.data import SPECIES_EN
 
@@ -38,6 +39,9 @@ class GBA:
         self.game_version = self.GameVersion(self.rom_file_data[0xAE])
         self.game_language = self.GameLanguage(self.rom_file_data[0xAF])
         self.game_revision = self.rom_file_data[0xBC]
+        logging.info(
+            f"Detected {self.game_language.name} {self.game_version.name} rev-{self.game_revision}"
+        )
         self.get_addresses()
         self.hook = MGBAHook()
 

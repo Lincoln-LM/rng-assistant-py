@@ -14,6 +14,8 @@ from core.exceptions import AddressOutOfRange
 instance: Instance = None
 windows = ()
 
+logging.getLogger().setLevel(logging.INFO)
+
 def file_callback():
     """Select ROM file"""
     # TODO: axe globals
