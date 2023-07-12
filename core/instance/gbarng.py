@@ -144,16 +144,14 @@ class GBA:
         """Pokemon summary info"""
 
         with dpg.window(label=title, width=240, pos=pos or [], no_close=True):
-            # TODO: caching images
-            species_texture = load_sprite(0, 0, False)
-            species_image = dpg.add_image(species_texture)
+            species_image = dpg.add_image(load_sprite(0, 0, False))
             species_label = dpg.add_text("Egg")
             pid_label = dpg.add_text("PID:")
             iv_label = dpg.add_text("IVs:")
 
         def update():
             pk3 = PK3(self.hook.read_bytes(address, 0x50))
-            load_sprite(pk3.species, 0, pk3.shiny, species_texture)
+            dpg.configure_item(species_image, texture_tag=load_sprite(pk3.species, 0, pk3.shiny))
             dpg.set_value(species_label, SPECIES_EN[pk3.species])
             dpg.set_value(pid_label, f"PID: {pk3.pid:08X}")
             dpg.set_value(iv_label, f"IVs: {'/'.join(map(str, pk3.ivs))}")

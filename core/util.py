@@ -81,19 +81,16 @@ def get_pid_list(key_word: str = None):
             pid_list.append(f"{path} ({pid})")
     return pid_list
 
-# maps tags to their currently loaded species/form/shiny to avoid loading mulitple times
-TAG_CURRENT_SPRITE = {}
+CACHED_TAGS = []
 
-def load_sprite(species: int, form: int, shiny: bool, existing_tag: str = None):
+def load_sprite(species: int, form: int, shiny: bool):
     """Load sprite for use in dpg1"""
     if species == 0:
         shiny = False
-    if existing_tag is not None:
-        if TAG_CURRENT_SPRITE.get(existing_tag, None) == (species, form, shiny):
-            return
-        TAG_CURRENT_SPRITE[existing_tag] = (species, form, shiny)
     # TODO: better sprite solution
     name = f"{species}{f'-{form}' if form else ''}{'s' if shiny else ''}"
+    if name in CACHED_TAGS:
+        return name
     url = f"https://github.com/kwsch/PKHeX/blob/master/PKHeX.Drawing.PokeSprite/Resources/img/Big%20{'Shiny' if shiny else 'Pokemon'}%20Sprites/b_{name}.png?raw=true"
     response = requests.get(url)
     img = Image.open(BytesIO(response.content)).convert("RGBA")
@@ -105,11 +102,10 @@ def load_sprite(species: int, form: int, shiny: bool, existing_tag: str = None):
             dpg_image.append(pixel[1] / 255)
             dpg_image.append(pixel[2] / 255)
             dpg_image.append(pixel[3] / 255)
-    if existing_tag is not None:
-        dpg.set_value(existing_tag, dpg_image)
-        return existing_tag
+    CACHED_TAGS.append(name)
     with dpg.texture_registry(show=False):
-        return dpg.add_dynamic_texture(
+        return dpg.add_static_texture(
+            tag=name,
             width=68,
             height=56,
             default_value=dpg_image,

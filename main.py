@@ -7,7 +7,7 @@ import logging
 import dearpygui.dearpygui as dpg
 import mem_edit
 
-from core.util import get_pid_list
+from core.util import get_pid_list, load_sprite
 from core.instance.gbarng import GBA as Instance
 from core.exceptions import AddressOutOfRange
 
@@ -40,6 +40,9 @@ def refresh_callback():
 dpg.create_context()
 dpg.create_viewport(title="RNG Assistant", width=800, height=600, vsync=False)
 dpg.setup_dearpygui()
+
+# pre-load blank sprite
+load_sprite(0, 0, False)
 
 with dpg.window(tag="Settings"):
     file_label = dpg.add_text("No Rom Selected...")
