@@ -24,6 +24,7 @@ class GBA:
         EMERALD = ord("E")
 
     RSE = (GameVersion.RUBY, GameVersion.SAPPHIRE, GameVersion.EMERALD)
+    RS = (GameVersion.RUBY, GameVersion.SAPPHIRE)
 
     class GameLanguage(IntEnum):
         """Gen 3 game langauge"""
@@ -136,9 +137,12 @@ class GBA:
     def rng_info_window(self):
         """RNG seed info"""
 
+        def detect_tid_seed():
+            self.initial_seed = self.hook.read_uint(self.initial_seed_addr, 2)
+
         with dpg.window(label="RNG Info", width=240, height=150, no_close=True, pos=[1, 100 + 25]):
             if self.game_version in self.RSE:
-                detect_initial_seeding_check = dpg.add_checkbox(label = "Detect Initial Seeding")
+                detect_tid_seed = dpg.add_button(label="Detect TID Seed", callback=detect_tid_seed)
             initial_seed_label = dpg.add_text("Initial Seed:")
             current_seed_label = dpg.add_text("Current Seed:")
             current_advance_label = dpg.add_text("Current Advance:")
@@ -147,20 +151,20 @@ class GBA:
 
         def update():
             current_seed = self.hook.read_uint(self.current_seed_addr, 4)
-            if self.initial_seed_addr is not None:
+            if self.game_version not in self.RSE:
                 self.initial_seed = self.hook.read_uint(self.initial_seed_addr, 2)
             if self.vframe_addr is not None:
                 vframe = self.hook.read_uint(self.vframe_addr, 4)
                 # only 2 bytes used for reseeding
                 painting_timer = vframe & 0xFFFF
-                dpg.set_value(painting_timer_label, f"Painting Timer: {painting_timer:02X}")
-                if dpg.get_value(detect_initial_seeding_check):
-                    # vframe == 0 only happens on game restart or 32 bit overflow (lol)
-                    if vframe == 0:
-                        self.initial_seed = self.hook.read_uint(self.current_seed_addr, 4)
-                    # painting_timer == current_seed on painting reseed or rare false positive
-                    if painting_timer == current_seed:
-                        self.initial_seed = self.hook.read_uint(self.current_seed_addr, 4)
+                dpg.set_value(painting_timer_label, f"Painting Timer: {painting_timer:04X}")
+
+                # vframe == 0 only happens on game restart or 32 bit overflow (lol)
+                if vframe == 0 and self.game_version in self.RS:
+                    self.initial_seed = self.hook.read_uint(self.current_seed_addr, 4)
+                # painting_timer == current_seed on painting reseed or rare false positive
+                if painting_timer == current_seed:
+                    self.initial_seed = self.hook.read_uint(self.current_seed_addr, 4)
             current_advance = lcrng_distance(self.initial_seed, current_seed)
             dpg.set_value(initial_seed_label, f"Initial Seed: {self.initial_seed:08X}")
             dpg.set_value(current_seed_label, f"Current Seed: {current_seed:08X}")
