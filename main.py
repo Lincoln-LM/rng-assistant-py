@@ -8,11 +8,17 @@ import dearpygui.dearpygui as dpg
 import mem_edit
 
 from core.util import get_pid_list, load_sprite
-from core.instance.gbarng import GBA as Instance
+from core.instance.gbarng import GBA
+from core.instance.ndsrng import NDS
 from core.exceptions import AddressOutOfRange
 
-instance: Instance = None
+instance: GBA | NDS = None
 windows = ()
+
+consoles = {
+    "GBA (mGBA)": GBA,
+    "NDS (melonDS)": NDS,
+}
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -25,7 +31,7 @@ def file_callback():
     root.withdraw()
     file_path = filedialog.askopenfilename()
     dpg.set_value(file_label, file_path)
-    instance = Instance(file_path)
+    instance = consoles[dpg.get_value(console_dropdown)](file_path)
     windows = instance.get_windows()
 
 def hook_callback():
@@ -37,7 +43,12 @@ def hook_callback():
 
 def refresh_callback():
     """Refresh process list"""
-    dpg.configure_item(pid_dropdown, items=get_pid_list(Instance.KEY_WORD))
+    dpg.configure_item(
+        pid_dropdown,
+        items=get_pid_list(
+            consoles[dpg.get_value(console_dropdown)].KEY_WORD
+        )
+    )
 
 dpg.create_context()
 dpg.create_viewport(title="RNG Assistant", width=800, height=600, vsync=False)
@@ -48,8 +59,9 @@ load_sprite(0, 0, False)
 
 with dpg.window(tag="Settings"):
     file_label = dpg.add_text("No Rom Selected...")
+    console_dropdown = dpg.add_combo(list(consoles.keys()), callback=refresh_callback)
     file_selector = dpg.add_button(label="Select Rom", callback=file_callback)
-    pid_dropdown = dpg.add_combo(get_pid_list(Instance.KEY_WORD))
+    pid_dropdown = dpg.add_combo([])
     hook_button = dpg.add_button(label="Hook", callback=hook_callback)
     refresh_button = dpg.add_button(label="Refresh", callback=refresh_callback)
 
